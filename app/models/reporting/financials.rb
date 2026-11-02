@@ -53,25 +53,24 @@ module Reporting
         .sort_by { -it[:billed] }
     end
 
-    # Fixed-price work the client approved that hasn't all been invoiced: money earned or
-    # promised and not yet asked for.
+    # Fixed-price work with a price (set in the QuickBooks plugin) that hasn't all been invoiced:
+    # money earned or promised and not yet asked for.
     def unbilled
       invoiced = Quickbooks::Invoice.billed.where.not(engagement_id: nil).group(:engagement_id).sum(:total_cents)
-      ::Engagement.where(shape: "fixed").includes(:client, agreement_versions: [ :approval, :scope_items ]).select(&:approved?)
-        .map { |engagement| { engagement: engagement, agreed: engagement.agreed_amount_cents, invoiced: invoiced[engagement.id].to_i } }
+      Quickbooks::Price.joins(:engagement).merge(::Engagement.where(shape: "fixed")).includes(engagement: :client)
+        .map { |price| { engagement: price.engagement, agreed: price.amount_cents, invoiced: invoiced[price.engagement_id].to_i } }
         .select { it[:agreed] > it[:invoiced] }.sort_by { it[:invoiced] - it[:agreed] }
     end
 
-    # Every open service, its agreed amount as a month, and whether QuickBooks bills it as
-    # agreed. Recurring revenue QuickBooks doesn't bill is revenue quietly going unbilled.
+    # Every open service with a price, as a month, and whether QuickBooks bills it at that price.
+    # Recurring revenue QuickBooks doesn't bill is revenue quietly going unbilled.
     def recurring
       links = Quickbooks::RecurringLink.all.index_by(&:engagement_id)
-      ::Engagement.open.where(shape: "recurring").includes(:client, agreement_versions: [ :approval, :scope_items ]).select(&:approved?).map do |engagement|
-        version = engagement.current_version
-        link = links[engagement.id]
-        monthly = (version.amount_cents * MONTHLY.fetch(version.cadence.to_s, 1r)).round
+      Quickbooks::Price.joins(:engagement).merge(::Engagement.open.where(shape: "recurring")).includes(engagement: :client).map do |price|
+        link = links[price.engagement_id]
+        monthly = (price.amount_cents * MONTHLY.fetch(price.cadence.to_s, 1r)).round
         state = if link.nil? then "not billed" elsif !link.in_sync? then "out of step" else "billed" end
-        { engagement: engagement, amount: version.amount_cents, cadence: version.cadence, monthly: monthly, link: link, state: state }
+        { engagement: price.engagement, amount: price.amount_cents, cadence: price.cadence, monthly: monthly, link: link, state: state }
       end.sort_by { -it[:monthly] }
     end
 

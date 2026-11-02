@@ -26,7 +26,7 @@ else
   end
   json.unbilled financials.unbilled do |row|
     json.engagement agent_ref(row[:engagement])
-    json.agreed_cents row[:agreed]
+    json.price_cents row[:agreed]
     json.invoiced_cents row[:invoiced]
     json.remaining_cents row[:agreed] - row[:invoiced]
   end

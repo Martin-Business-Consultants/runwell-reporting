@@ -1,7 +1,7 @@
 module Reporting
   # A Runwell plugin: financial reports for owners and managers, read from what the QuickBooks
-  # plugin brings in (billed, collected, receivables, clients, recurring revenue, unbilled
-  # agreed work) and from QuickBooks' own profit and loss. It has no tables: every number is
+  # plugin brings in (billed, collected, receivables, clients, recurring revenue, priced work
+  # not yet invoiced, all against the prices set in the QuickBooks plugin) and from QuickBooks' own profit and loss. It has no tables: every number is
   # one an accountant can find in the books.
   class Engine < ::Rails::Engine
     initializer "reporting.routes" do |app|
@@ -18,8 +18,8 @@ module Reporting
 
     config.to_prepare do
       Runwell::Plugins.register :reporting, name: "Reporting", version: Reporting::VERSION, author: "Runwell",
-        enabled_by_default: false, requires: ">= 2.1.0", homepage: "https://github.com/Martin-Business-Consultants/runwell-reporting",
-        description: "Financial reports from QuickBooks: billed and collected by month, what clients owe and how late, revenue by client, recurring revenue and whether QuickBooks bills all of it, agreed work not yet invoiced, and profit and loss. Needs the QuickBooks plugin."
+        enabled_by_default: false, requires: ">= 3.0.0", homepage: "https://github.com/Martin-Business-Consultants/runwell-reporting",
+        description: "Financial reports from QuickBooks: billed and collected by month, what clients owe and how late, revenue by client, recurring revenue and whether QuickBooks bills all of it, priced work not yet invoiced, and profit and loss. Needs the QuickBooks plugin."
       Runwell::Plugins.permission :reporting, :view_financials, name: "See financial reports", roles: %w[owner manager]
       Runwell::Plugins.nav :reporting, "Reports", -> { reporting_report_path if can?(:view_financials) }
       Runwell::Plugins.stylesheet :reporting, "reporting/reports"

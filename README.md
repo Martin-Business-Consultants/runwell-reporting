@@ -15,7 +15,7 @@ plugin's tables. It starts off: switch it on in Settings > Plugins.
 From the command line on the server: `bin/rails "plugins:install[Martin-Business-Consultants/runwell-reporting]"`, then restart
 Runwell.
 
-Needs Runwell 2.1.0 or later. A plugin can use only the gems Runwell bundles.
+Needs Runwell 3.0.0 and the QuickBooks plugin 0.2.0 or later, whose prices (set on each engagement) it reports against (0.1.0 is the version for Runwell 2.x, which read agreements). A plugin can use only the gems Runwell bundles.
 
 ## Updating
 

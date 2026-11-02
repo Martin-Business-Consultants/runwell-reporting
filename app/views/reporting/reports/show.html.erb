@@ -130,16 +130,16 @@
           <% end %>
         </ul>
         <% if recurring.empty? %>
-          <p class="txt-small txt-subtle margin-none">No open, approved services.</p>
+          <p class="txt-small txt-subtle margin-none">No open services with a price. Set one on a service’s QuickBooks tab.</p>
         <% else %>
-          <p class="txt-x-small txt-subtle margin-none">Dormant: QuickBooks doesn’t bill it. Blocked: QuickBooks bills something other than what was agreed.</p>
+          <p class="txt-x-small txt-subtle margin-none">Dormant: QuickBooks doesn’t bill it. Blocked: QuickBooks bills something other than its price.</p>
         <% end %>
       </section>
 
       <% unbilled = financials.unbilled %>
       <section class="settings__section flex flex-column gap-half">
         <header>
-          <h2 class="divider">Approved, not yet invoiced</h2>
+          <h2 class="divider">Priced, not yet invoiced</h2>
         </header>
         <ul class="settings__scrollable-list">
           <% unbilled.each do |row| %>
@@ -147,7 +147,7 @@
             <li class="flex align-center gap-half txt-small" data-filter-target="item">
               <%= link_to engagement_path(row[:engagement]), class: "txt-ink txt-align-start overflow-ellipsis min-width" do %>
                 <strong><%= row[:engagement].ref %> <%= row[:engagement].title %></strong>
-                <div class="txt-x-small txt-subtle"><%= row[:engagement].client.name %> · agreed <%= money row[:agreed] %> · invoiced <%= money row[:invoiced] %><%= " · closed" if row[:engagement].closed? %></div>
+                <div class="txt-x-small txt-subtle"><%= row[:engagement].client.name %> · price <%= money row[:agreed] %> · invoiced <%= money row[:invoiced] %><%= " · closed" if row[:engagement].closed? %></div>
               <% end %>
               <hr class="separator--horizontal flex-item-grow txt-subtle" aria-hidden="true">
               <strong class="txt-nowrap"><%= money row[:agreed] - row[:invoiced] %></strong>
@@ -155,7 +155,7 @@
           <% end %>
         </ul>
         <% if unbilled.empty? %>
-          <p class="txt-small txt-subtle margin-none">Everything approved has been invoiced.</p>
+          <p class="txt-small txt-subtle margin-none">Everything priced has been invoiced.</p>
         <% end %>
       </section>
 
